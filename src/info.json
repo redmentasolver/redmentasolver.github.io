@@ -1,3 +1,10 @@
 {
-"version": "1.0.0"
+"version": "1.0.0",
+"files": [
+    "RUN.bat",
+    "activateCode.js",
+    "ai.js",
+    "app.js",
+    "getData.js",
+    "setup.js"
 }
