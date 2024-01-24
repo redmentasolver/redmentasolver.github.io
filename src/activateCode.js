@@ -25,7 +25,7 @@ async function main() {
             "content-type": 'application/json',
         }
     })
-    const sha = sha256(code.toString() + api.git + time)
+    const sha = sha256(code.toString() + api.git + time.toString())
     let found = false
     let response;
     console.log("Megpróbáljuk a kódot... Ez eltarthat egy pár percig")
