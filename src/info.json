@@ -6,5 +6,8 @@
     "ai.js",
     "app.js",
     "getData.js",
-    "setup.js"]
+    "updateNow.js",
+    "UPDATE.bat",
+    "setup.js",
+    "update.js"]
 }
