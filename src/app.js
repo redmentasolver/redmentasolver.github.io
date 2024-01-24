@@ -247,7 +247,7 @@ async function load(account, answering) {
         }
         const urlSplit = (await driver.getCurrentUrl()).split('ks_id=')
         const hasNextPage = ((await driver.findElements(By.css("button[aria-label='Következő oldal']"))).length > 0) ? true : false
-        const data = JSON.stringify({ "blocks": blocks, "ks_id": urlSplit[urlSplit.length - 1], "hasNextPage": hasNextPage})
+        const data = JSON.stringify({ "blocks": blocks, "ks_id": urlSplit[urlSplit.length - 1]})
         fs.writeFileSync("blocks.json", data, (err) => {
             if (err) {
                 console.log(err);
