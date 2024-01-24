@@ -72,6 +72,7 @@ async function answerQuestions(keepBeforeAnswers) {
             }
         }
     }
+    console.log("Elhasználtál \u001b[31m" + response.usesUsed + "\u001b[0m feladat kitöltést,\n így már csak \u001b[32m" + response.usesLeft + "\u001b[0m feladat kitöltésed van.")
     console.log(response)
     const data = JSON.stringify(response)
     fs.writeFileSync("answers.json", data, (err) => {
