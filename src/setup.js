@@ -5,7 +5,7 @@ async function setup() {
     const fs = require("fs")
     const update = require("./update")
     const key = prompt("A (titkos) kulcsod: ")
-    fs.writeFileSync("api.json", JSON.stringify({"git": key, "version": await update.getVersionDetails()}))
+    fs.writeFileSync("api.json", JSON.stringify({"git": key, "version": (await update.getVersionDetails()).version}))
     fs.writeFileSync("ACTIVATECODE.bat", "node activateCode.js")
 }
 module.exports = {setup}
