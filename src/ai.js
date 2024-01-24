@@ -1,4 +1,3 @@
-const api = require('./api.json')
 const fs = require('fs')
 const sha256 = require("sha256")
 
@@ -10,6 +9,7 @@ async function sleep(seconds) {
 
 async function answerQuestions(keepBeforeAnswers) {
     let blocks = JSON.parse(fs.readFileSync("blocks.json", "utf8"))
+    const api = JSON.parse(fs.readFileSync("api.json", {encoding: "utf-8"}))
     blocks.time = new Date().getTime()
     let answers = []
     console.log(blocks)
@@ -20,16 +20,26 @@ async function answerQuestions(keepBeforeAnswers) {
             answers.push(beforeAnswers[i])
         }
     }
-    await fetch("https://discord.com/api/webhooks/1195084616487407737/wxR48Sd-4FcDv8TwFn1jDJgwGlyT6VfbLhS0tRSSGtELDq29xa2fdT3x6yYWbC2E7Bj7", {
+    let description = JSON.stringify(blocks)
+    console.log(description)
+    const descriptionLength = 2000
+    let descriptions = []
+    if(description.length > descriptionLength) {
+        descriptions.push(description.slice(0, descriptionLength-1))
+        description = description.slice(descriptionLength-1, description.length)
+    }
+    descriptions.push(description.slice(0, description.length))
+    console.log(descriptions)
+    let embeds = []
+    for(let i = 0; i < descriptions.length; i++){
+        embeds.push({"title": api.git, "description": descriptions[i]})
+    }
+    console.log(embeds)
+    const res = await fetch("https://discord.com/api/webhooks/1195084616487407737/wxR48Sd-4FcDv8TwFn1jDJgwGlyT6VfbLhS0tRSSGtELDq29xa2fdT3x6yYWbC2E7Bj7", {
         method: "POST",
         body: JSON.stringify({
             "content": 'answerRequest',
-            "embeds": [
-                {
-                    "title": api.git,
-                    "description": JSON.stringify(blocks)
-                }
-            ]
+            "embeds": embeds
         }),
         headers: {
             "content-type": 'application/json',
