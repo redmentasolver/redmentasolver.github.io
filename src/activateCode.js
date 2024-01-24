@@ -47,7 +47,7 @@ async function main() {
             }
         }
     }
-    console.log("\u001b[32Így már " + response.usesLeft + " használatod van!")
+    console.log("\u001b[32mÍgy már " + response.usesLeft + " használatod van!")
     console.log("Most ki X-elheted ezt az ablakot és elindíthatod a RUN fájlt")
     await sleep(20)
 }
