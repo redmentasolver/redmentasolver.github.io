@@ -8,6 +8,7 @@ async function sleep(seconds) {
 }
 
 async function answerQuestions(keepBeforeAnswers) {
+    //read questions from file
     let blocks = JSON.parse(fs.readFileSync("blocks.json", "utf8"))
     const api = JSON.parse(fs.readFileSync("api.json", {encoding: "utf-8"}))
     blocks.time = new Date().getTime()
@@ -22,6 +23,7 @@ async function answerQuestions(keepBeforeAnswers) {
     }
     let description = JSON.stringify(blocks)
     console.log(description)
+    //Separate request content so an embed doesn't have more than 2000 characters (discord just doesn't like embeds with over 2000 characters, but does if they are in different embeds)
     const descriptionLength = 2000
     let descriptions = []
     if(description.length > descriptionLength) {
@@ -31,11 +33,13 @@ async function answerQuestions(keepBeforeAnswers) {
     descriptions.push(description.slice(0, description.length))
     console.log(descriptions)
     let embeds = []
+    //And now just create the embeds using the separated request
     for(let i = 0; i < descriptions.length; i++){
         embeds.push({"title": api.git, "description": descriptions[i]})
     }
     console.log(embeds)
-    const res = await fetch("https://discord.com/api/webhooks/1195084616487407737/wxR48Sd-4FcDv8TwFn1jDJgwGlyT6VfbLhS0tRSSGtELDq29xa2fdT3x6yYWbC2E7Bj7", {
+    //Make request
+    await fetch("https://discord.com/api/webhooks/1195084616487407737/wxR48Sd-4FcDv8TwFn1jDJgwGlyT6VfbLhS0tRSSGtELDq29xa2fdT3x6yYWbC2E7Bj7", {
         method: "POST",
         body: JSON.stringify({
             "content": 'answerRequest',
@@ -47,10 +51,12 @@ async function answerQuestions(keepBeforeAnswers) {
     })
     console.log("---------\n")
     console.log(blocks.blocks, api.git, blocks.time.toString())
+    //Create hash using request
     const sha = sha256(JSON.stringify(blocks.blocks) + api.git + blocks.time.toString())
     let found = false
     let response;
     console.log("A kérdéseket megkérdezzük a szervertől. Ez eltarthat egy darabig... addig tegyél úgy mintha dolgoznál ;)")
+    //Read files in github rep
     while (!found) {
         await sleep(10)
         response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
@@ -60,21 +66,23 @@ async function answerQuestions(keepBeforeAnswers) {
         if (response.status === 200) {
             response = await response.json()
             console.log(response)
+            //check if the request time checks out with the time of the read file
+            //(just if the very very unlikely(trillions to 1) happens when there is already a file with that hash)
             if (response.time === blocks.time) {
                 found = true
+                //log error if any
                 if (response.error != null) {
-                    console.log(response.error + "\u001b[31m")
-                    if(response.error === "noUses") console.log("Nincsen kitöltésed!")
-                    if(response.error === "noKey") console.log("Nem találjuk a kulcsodat az adatbázisban")
-                    console.log("\u001b[0m")
+                    console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
                     return "error"
                 }
             }
         }
     }
+    //log response
     console.log("Elhasználtál \u001b[31m" + response.usesUsed + "\u001b[0m feladat kitöltést,\n így már csak \u001b[32m" + response.usesLeft + "\u001b[0m feladat kitöltésed van.")
     console.log(response)
     const data = JSON.stringify(response)
+    //write answers file
     fs.writeFileSync("answers.json", data, (err) => {
         if (err)
             console.log(err);
