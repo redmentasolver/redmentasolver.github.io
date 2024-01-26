@@ -4,6 +4,7 @@ let direct_address = ""
 const fs = require("fs")
 const { answerQuestions } = require('./ai')
 require("geckodriver")
+//Just some random links to search if it detects you as a bot(it helps a bit)
 const randomLinks = [
     "https://www.youtube.com/watch?v=cD9Rpq8d_wk",
     "https://dmarket.com/ingame-items/item-list/rust-skins?exchangeTab=myOffers",
@@ -33,127 +34,114 @@ async function sleep(seconds) {
 
 var driver;
 
+async function logInWithCookie(account) {
+    //Go to website
+    await driver.get("https://redmenta.com/hu/desktop")
+    let loaded = false
+    console.log("Loading...")
+    //Wait till loaded
+    while (!loaded) {
+        await sleep(0.5)
+        var arr = await driver.findElements(By.css("#loginBtn"))
+        if (arr.length > 0) {
+            console.log('loaded')
+            loaded = true
+            break;
+        }
+        console.log('...')
+    }
+    //Press accept cookies button
+    await driver.findElement(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl')).click()
+    //Add rl21 cookie
+    await driver.manage().addCookie({ name: "rl21", value: account.cookie, domain: "redmenta.com", path: "/" })
+    //Proceed to website
+    await driver.get("https://redmenta.com/hu/desktop")
+    loaded = false
+    console.log("Loading...")
+}
+
+async function logInWithDetails(account) {
+    let error_ = true
+    await driver.get("https://redmenta.com/hu/desktop")
+    let loaded = false
+    console.log("Loading...")
+    while (!loaded) {
+        await sleep(0.5)
+        var arr = await driver.findElements(By.css("#loginBtn"))
+        if (arr.length > 0) {
+            console.log('loaded')
+            loaded = true
+            break;
+        }
+        console.log('...')
+    }
+    //press accept cookies button if its there
+    const cookiesBtnList = await driver.findElements(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl'))
+    if (cookiesBtnList.length > 0) await cookiesBtnList[0].click()
+    await sleep(Math.max(Math.random() * 2, 0.55))
+    const email_text = driver.findElement(By.css("#please-login > main > div > div > form > div:nth-child(2) > input"));
+    const password_text = driver.findElement(By.css("#please-login > main > div > div > form > div:nth-child(3) > input"));
+    const login_btn = driver.findElement(By.css("#loginBtn"))
+    email = account.email
+    password = account.password
+    //Fill in account details
+    email_text.click()
+    email_text.clear()
+    await email_text.sendKeys(email)
+    await sleep(Math.max(Math.random() / 1.5, 0.15))
+    password_text.click()
+    password_text.clear()
+    await password_text.sendKeys(password)
+    await sleep(Math.max(Math.random() * 3, 0.25))
+    login_btn.click()
+    loaded = false
+    //Proceed to page
+    console.log('Loading main page...')
+    while (!loaded) {
+        await sleep(Math.max(Math.random() / 2, 0.05))
+        //look for a button thats on the main page(if its there the site loaded)
+        var arr = await driver.findElements(By.css("#desktop > main > div > div.flex.flex-column.gap-4.pt-7.items-center.w-full > div > div > button > div"))
+        if (arr.length > 0) {
+            console.log('loaded')
+            loaded = true
+            error_ = false
+            break;
+        }
+        //if theres an error then it tries to log in again
+        if ((await driver.findElements(By.css("body"))).length !== 0) {
+            const text = await driver.findElement(By.css("body")).getText()
+            if (text.includes("error")) {
+                console.log("error")
+                loaded = true
+                await sleep(Math.max(Math.random() * 3, 1))
+                if (Math.random() >= 0.5) await driver.get(randomLinks[Math.round(Math.random() * randomLinks.length - 1)])
+                else await driver.get("https://redmenta.com/hu/login")
+                await sleep((Math.random() * 3) ^ 2)
+                await driver.get("https://redmenta.com/hu/desktop")
+            }
+        }
+        console.log('...')
+    }
+    await sleep(1)
+    return error_
+}
+
 async function load(account, answering) {
-    const options = await new firefox.Options()
-    //options.setProxy(proxy.manual({
-    //    http: proxy_server_http,
-    //    https: proxy_server_https,
-    //    noProxy: 'localhost,127.0.0.1',
-    //}))
+    //Open browser
+    const options = new firefox.Options()
     options.windowSize({ width: 1280, height: 720 })
     driver = await new Builder().forBrowser("firefox").setFirefoxOptions(options).build()
-    driver.get("https://redmenta.com/hu/desktop")
-    let restarted = false
+    await driver.get("https://redmenta.com/hu/desktop")
     let error_ = true
-    if (account.cookie != null) {
-        await driver.get("https://redmenta.com/hu/desktop")
-        let loaded = false
-        console.log("Loading...")
-        while (!loaded) {
-            await sleep(0.5)
-            var arr = await driver.findElements(By.css("#loginBtn"))
-            if (arr.length > 0) {
-                console.log('loaded')
-                loaded = true
-                break;
-            }
-            console.log('...')
-        }
-        await driver.findElement(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl')).click()
-        driver.manage().addCookie({ name: "rl21", value: account.cookie, domain: "redmenta.com", path: "/" })
-        await driver.get("https://redmenta.com/hu/desktop")
-        loaded = false
-        console.log("Loading...")
-        while (!loaded) {
-            await sleep(0.5)
-            var arr = await driver.findElements(By.css("#loginBtn"))
-            if (arr.length > 0) {
-                console.log('loaded')
-                loaded = true
-                break;
-            }
-            console.log('...')
-        }
-    }
-    while (error_ && account.cookie == null) {
-        await driver.get("https://redmenta.com/hu/desktop")
-        let loaded = false
-        console.log("Loading...")
-        while (!loaded) {
-            await sleep(0.5)
-            var arr = await driver.findElements(By.css("#loginBtn"))
-            if (arr.length > 0) {
-                console.log('loaded')
-                loaded = true
-                break;
-            }
-            console.log('...')
-        }
-        if (!restarted) await driver.findElement(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl')).click()
-        await sleep(Math.max(Math.random() * 2, 0.55))
-        const email_text = driver.findElement(By.css("#please-login > main > div > div > form > div:nth-child(2) > input"));
-        const password_text = driver.findElement(By.css("#please-login > main > div > div > form > div:nth-child(3) > input"));
-        const login_btn = driver.findElement(By.css("#loginBtn"))
-        email_text.click()
-        email_text.clear()
-        email = account.email.split('')
-        password = account.password.split('')
-        const abc = "abcdefghijklmnopqrstuvwxyz".split('')
-        for (let i = 0; i < email.length; i++) {
-            await email_text.sendKeys(email[i])
-            await sleep(Math.max(Math.random() / 3, 0.1))
-            if (Math.round(Math.random() / 1.85) === 1) {
-                await email_text.sendKeys(abc[Math.round(Math.random() * 23)])
-                await sleep(Math.max(Math.random() / 4, 0.05))
-                await email_text.sendKeys(Key.BACK_SPACE)
-                await sleep(Math.max(Math.random() / 4, 0.05))
-            }
-        }
-        await sleep(Math.max(Math.random() / 1.5, 0.15))
-        password_text.click()
-        password_text.clear()
-        for (let i = 0; i < password.length; i++) {
-            await password_text.sendKeys(password[i])
-            await sleep(Math.max(Math.random() / 4, 0.05))
-            if (Math.round(Math.random() / 1.85) === 1) {
-                await password_text.sendKeys(abc[Math.round(Math.random() * 23)])
-                await sleep(Math.max(Math.random() / 4, 0.05))
-                await password_text.sendKeys(Key.BACK_SPACE)
-            }
-        }
-        await sleep(Math.max(Math.random() * 3, 0.25))
-        login_btn.click()
-        loaded = false
-        console.log('Loading main page...')
-        while (!loaded) {
-            await sleep(Math.max(Math.random() / 2, 0.05))
-            var arr = await driver.findElements(By.css("#desktop > main > div > div.flex.flex-column.gap-4.pt-7.items-center.w-full > div > div > button > div"))
-            if (arr.length > 0) {
-                console.log('loaded')
-                loaded = true
-                error_ = false
-                break;
-            }
-            if ((await driver.findElements(By.css("body"))).length !== 0) {
-                const text = await driver.findElement(By.css("body")).getText()
-                if (text.includes("error")) {
-                    console.log("error")
-                    loaded = true
-                    restarted = true
-                    await sleep(Math.max(Math.random() * 3, 1))
-                    if (Math.random() >= 0.5) await driver.get(randomLinks[Math.round(Math.random() * randomLinks.length - 1)])
-                    else await driver.get("https://redmenta.com/hu/login")
-                    await sleep((Math.random() * 3) ^ 2)
-                    await driver.get("https://redmenta.com/hu/desktop")
-                }
-            }
-            console.log('...')
-        }
-        await sleep(1)
-    }
+    //Log in with cookie if it was given
+    if (account.cookie != null) await logInWithCookie(account)
+    //log in with account details if cookie wasn't given
+    while (error_ && account.cookie == null) try { error_ = await logInWithDetails(account) } catch (err) { console.log(err) }
+    await sleep(2)
     await driver.get("https://redmenta.com/" + direct_address)
+    console.log("https://redmenta.com/" + direct_address)
     console.log('Loading direct address...')
-    loaded = false
+    let loaded = false
     while (!loaded) {
         await sleep(1)
         var arr = await driver.findElements(By.css("#startFillingBtn"))
@@ -164,35 +152,38 @@ async function load(account, answering) {
         }
         console.log('...')
     }
+    //Start filling
     const start_btn = await driver.findElement(By.css("#startFillingBtn"))
     start_btn.click()
     await sleep(1)
     let keepAnswers = false
     let nextPage = true
     while (nextPage) {
+        //Get the array of questions
         const array = await driver.findElements(By.css("#filling > main > article > div.mt-4 > article > div > div > div > section"))
         console.log(array.length)
         let blocks = []
         for (let i = 0; i < array.length; i++) {
+            //Get the task id
             const id = await array[i].getAttribute("id")
             let image = null;
-            if (((await driver.findElements(By.css("#" + id + " img")))).length > 0) image = await driver.findElement(By.css("#" + id + " img")).getAttribute("src")
+            //Get the image if there is any
+            if ((await driver.findElements(By.css("#" + id + " img"))).length > 0) image = await driver.findElement(By.css("#" + id + " img")).getAttribute("src")
             console.log(image)
             const type = (await driver.findElement(By.css("#" + id + " > div:nth-of-type(1) > div > div:nth-of-type(2)")).getText()).split('\n').join(' ')
             console.log(type)
             let answer;
             if (type === "IGAZ-HAMIS") {
-                console.log("#" + id + " .hidden > div")
                 const group = (await driver.findElements(By.css("#" + id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div"))).length
                 const len = (await driver.findElements(By.css("#" + id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div"))).length
                 console.log("igazhamis", len, group)
                 console.log("igazhamis")
                 let answers = []
-                for(let j = 1; j <= len; j++){
+                for (let j = 1; j <= len; j++) {
                     console.log(j)
                     const element = await driver.findElement(By.css("#" + id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(" + j + ")"))
                     const text = await element.getAttribute("textContent")
-                    answers.push(text.substring(0, text.length-9))
+                    answers.push(text.substring(0, text.length - 9))
                 }
                 answer = answers
             }
@@ -247,7 +238,7 @@ async function load(account, answering) {
         }
         const urlSplit = (await driver.getCurrentUrl()).split('ks_id=')
         const hasNextPage = ((await driver.findElements(By.css("button[aria-label='Következő oldal']"))).length > 0) ? true : false
-        const data = JSON.stringify({ "blocks": blocks, "ks_id": urlSplit[urlSplit.length - 1]})
+        const data = JSON.stringify({ "blocks": blocks, "ks_id": urlSplit[urlSplit.length - 1] })
         fs.writeFileSync("blocks.json", data, (err) => {
             if (err) {
                 console.log(err);
@@ -295,66 +286,51 @@ async function fillOut() {
         }
     }
 }
+async function subFunctionPairItems(answer, i) {
+    let found = false
+    console.log(answer.answer)
+    const group = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div"))).length
+    console.log("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button")
+    const len1 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button"))).length
+    const len2 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button"))).length
+    for (let k = 1; k <= len1; k++) {
+        let breaks = false
+        const text1 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).getText())
+        console.log(text1, answer.answer[0][i])
+        if (text1.includes(answer.answer[0][i]) | answer.answer[0][i].includes[text1]) {
+            await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).click()
+            await sleep(0.2)
+            for (let j = 1; j <= len2; j++) {
+                const text2 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).getText())
+                console.log(text2, answer.answer[1][i])
+                if (text2.includes(answer.answer[1][i]) | answer.answer[1][i].includes(text2)) {
+                    await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).click()
+                    console.log("found")
+                    found = true
+                    breaks = true
+                    break
+                }
+            }
+        }
+        if (breaks) break
+    }
+    return found
+}
 async function pairItems(answer) {
     console.log(answer.answer)
     console.log(answer.answer[0].length)
     let found = false
+    //Pair items
     for (let i = 0; i < answer.answer[0].length; i++) {
-        const len = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div"))).length
-        const group = (len === 2) ? 2 : 3
-        console.log("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button")
-        const len1 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button"))).length
-        const len2 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button"))).length
-        for (let k = 1; k <= len1; k++) {
-            let breaks = false
-            const text1 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).getText())
-            console.log(text1, answer.answer[1][i])
-            if (text1.includes(answer.answer[1][i]) | answer.answer[1][i].includes[text1]) {
-                await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).click()
-                await sleep(1)
-                for (let j = 1; j <= len2; j++) {
-                    const text2 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).getText())
-                    console.log(text2, answer.answer[0][i])
-                    if (text2.includes(answer.answer[1][i]) | answer.answer[1][i].includes(text2)) {
-                        await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + group + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).click()
-                        console.log("found")
-                        found = true
-                        breaks = true
-                        break
-                    }
-                }
-            }
-            if (breaks) break
-        }
+        await subFunctionPairItems(answer, i)
     }
     if (found) return
+    const tmp = answer.answer[0]
+    answer.answer[0] = answer.answer[1]
+    answer.answer[1] = tmp
+    //Do the same thing again but with it with the arrays swithched(the ai sometimes gives the answers switched)
     for (let i = 0; i < answer.answer[0].length; i++) {
-        const len = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div"))).length
-        console.log("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(1) > button")
-        if (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ")")).getAttribute("class") === "flex flex-col gap-4") break
-        const len1 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(1) > button"))).length
-        const len2 = (await driver.findElements(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(2) > button"))).length
-        for (let k = 1; k <= len1; k++) {
-            let breaks = false
-            const text1 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).getText())
-            console.log(text1, answer.answer[0][i])
-            if (text1.includes(answer.answer[0][i]) | answer.answer[0][i].includes(text1)) {
-                await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(1) > button:nth-of-type(" + k + ")")).click()
-                await sleep(1)
-                for (let j = 1; j <= len2; j++) {
-                    const text2 = (await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).getText())
-                    console.log(text2, answer.answer[1][i])
-                    if (text2.includes(answer.answer[1][i]) | answer.answer[1][i].includes(text2)) {
-                        await driver.findElement(By.css("#" + answer.id + " > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(" + len + ") > div:nth-of-type(2) > button:nth-of-type(" + j + ")")).click()
-                        console.log("found")
-                        found = true
-                        breaks = true
-                        break
-                    }
-                }
-            }
-            if (breaks) break
-        }
+        await subFunctionPairItems(answer, i)
     }
 }
 async function chooseRightAnswer(answer) {
