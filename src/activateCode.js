@@ -1,6 +1,5 @@
 const prompt = require("prompt-sync")();
 const api = require("./api.json")
-const code = prompt("Activation Code: ")
 const time = new Date().getTime()
 const sha256 = require("sha256")
 async function sleep(seconds) {
@@ -9,7 +8,12 @@ async function sleep(seconds) {
     })
 }
 
+//Get activation code
+const code = prompt("Aktiváló Kód: ")
+main()
+
 async function main() {
+    //Make request
     fetch("https://discord.com/api/webhooks/1195084616487407737/wxR48Sd-4FcDv8TwFn1jDJgwGlyT6VfbLhS0tRSSGtELDq29xa2fdT3x6yYWbC2E7Bj7", {
         method: "POST",
         body: JSON.stringify({
@@ -25,12 +29,14 @@ async function main() {
             "content-type": 'application/json',
         }
     })
+    //generate hash from request
     const sha = sha256(code.toString() + api.git + time.toString())
     let found = false
     let response;
-    console.log("Megpróbáljuk a kódot... Ez eltarthat egy pár percig")
+    console.log("Megpróbáljuk a kódot... Ez eltarthat egy pár percig (kb. 30s-1m30s)")
     while (!found) {
         await sleep(10)
+        //Read File from github rep
         response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
             method: "GET",
         })
@@ -41,14 +47,12 @@ async function main() {
                 found = true
                 console.log(response)
                 if (response.error != null) {
-                    console.log("Hiba történt!  " + response.error)
+                    console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
                     return "error"
                 }
             }
         }
     }
     console.log("\u001b[32mÍgy már " + response.usesLeft + " használatod van!")
-    console.log("Most ki X-elheted ezt az ablakot és elindíthatod a RUN fájlt")
     await sleep(20)
 }
-main()
