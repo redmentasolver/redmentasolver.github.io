@@ -1,2 +1,2 @@
 const {start} = require("./app")
-start()
+start(true)
