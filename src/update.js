@@ -7,6 +7,8 @@ async function sleep(seconds) {
 async function update() {
     const info = await getVersionDetails()
     console.log(info)
+    const child_process = require("child_process")
+    child_process.execSync("npm i prompt-sync")
     const fs = require("fs")
     const prompt = require("prompt-sync")();
     let api = {};
