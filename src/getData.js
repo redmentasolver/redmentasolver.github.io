@@ -5,20 +5,22 @@ async function main() {
     catch {api.version = "0.0.0"}
 
     console.log(api)
+    //Update if current version is lower than the one on github
     const { returnHigherVersion , getVersionDetails, update} = require("./update");
     if(returnHigherVersion(api.version, (await getVersionDetails()).version) !== api.version) await update()
+    //run setup
     await setup()
     const { start } = require("./app")
     const fs = require("fs")
-    const key = JSON.parse(fs.readFileSync("api.json", {encoding: "utf-8"}))
+    const key = JSON.parse(fs.readFileSync(__dirname + "/api.json", {encoding: "utf-8"}))
     console.log("A kulcsod: " + key.git.substring(0, 8) + "....")
     console.log("\u001b[33m Ha még nincsen kitöltésed akkor X-eld ki ezt az ablakot és indítsd el az 'ACTIVATECODE' fájlt és írd be a kódot, ha nincs akkor: Too bad!")
     console.log("\u001b[0m")
     const prompt = require("prompt-sync")();
-    fs.writeFileSync("setup.js", "function setup(){}\nmodule.exports = {setup}")
+    fs.writeFileSync(__dirname + "/setup.js", "function setup(){}\nmodule.exports = {setup}")
     let accountDetails;
     console.log("A sütiddel könnyebben be lehet lépni a redmentába és nem érzékel robotnak az oldal")
-    const rl21 = prompt("Az rl21 sütid(ha nem tudod akkor CTRL+C):")
+    const rl21 = prompt("Az rl21 sütid(ha nem tudod hogy kell megszerezni akkor CTRL+C):")
 
     if (rl21 == null) {
         const email = prompt("A fiók email címe: ")
@@ -38,7 +40,7 @@ async function main() {
         "account": accountDetails,
         "direct_address": direct_adderess
     }
-    fs.writeFileSync("data.json", JSON.stringify(data))
-    start()
+    fs.writeFileSync(__dirname + "/data.json", JSON.stringify(data))
+    start(false)
 }
 main()
