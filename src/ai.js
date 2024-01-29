@@ -12,6 +12,9 @@ async function answerQuestions(keepBeforeAnswers, log) {
     let blocks = JSON.parse(fs.readFileSync(__dirname + "/blocks.json", "utf8"))
     const api = JSON.parse(fs.readFileSync(__dirname + "/api.json", { encoding: "utf-8" }))
     blocks.time = new Date().getTime()
+    console.log(JSON.stringify(blocks.blocks) + api.git + blocks.time.toString())
+    const sha = sha256(api.git + blocks.time.toString())
+    console.log(sha)
     let answers = []
     if (log) console.log(blocks)
     if (keepBeforeAnswers) {
@@ -50,7 +53,6 @@ async function answerQuestions(keepBeforeAnswers, log) {
     if (log) console.log("---------\n")
     if (log) console.log(blocks.blocks, api.git, blocks.time.toString())
     //Create hash using request
-    const sha = sha256(JSON.stringify(blocks.blocks) + api.git + blocks.time.toString())
     let found = false
     let response;
     console.log("A kérdéseket megkérdezzük a szervertől. Ez eltarthat egy darabig... addig tegyél úgy mintha dolgoznál ;)")
