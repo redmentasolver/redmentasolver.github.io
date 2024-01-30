@@ -58,25 +58,27 @@ async function answerQuestions(keepBeforeAnswers, log) {
     console.log("A kérdéseket megkérdezzük a szervertől. Ez eltarthat egy darabig... addig tegyél úgy mintha dolgoznál ;)")
     //Read files in github rep
     while (!found) {
-        await sleep(10)
-        response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
-            method: "GET",
-        })
-        console.log(response.status, sha)
-        if (response.status === 200) {
-            response = await response.json()
-            if (log) console.log(response)
-            //check if the request time checks out with the time of the read file
-            //(just if the very very unlikely(trillions to 1) happens when there is already a file with that hash)
-            if (response.time === blocks.time) {
-                found = true
-                //log error if any
-                if (response.error != null) {
-                    console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
-                    return "error"
+        try {
+            await sleep(10)
+            response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
+                method: "GET",
+            })
+            console.log(response.status, sha)
+            if (response.status === 200) {
+                response = await response.json()
+                if (log) console.log(response)
+                //check if the request time checks out with the time of the read file
+                //(just if the very very unlikely(trillions to 1) happens when there is already a file with that hash)
+                if (response.time === blocks.time) {
+                    found = true
+                    //log error if any
+                    if (response.error != null) {
+                        console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
+                        return "error"
+                    }
                 }
             }
-        }
+        } catch(err) {console.log(err)}
     }
     //log response
     console.log("Elhasználtál \u001b[31m" + response.usesUsed + "\u001b[0m feladat kitöltést,\n így már csak \u001b[32m" + response.usesLeft + "\u001b[0m feladat kitöltésed van.")
