@@ -22,7 +22,7 @@ async function update() {
         fs.writeFileSync(info.files[fileI], await getFileContent(info.files[fileI]))
         console.log("\u001b[32mUPDATED: " + info.files[fileI] + "\u001b[0m")
     }
-    fs.writeFileSync("api.json", '{"version":"' + info.version + '"}')
+    fs.writeFileSync("api.json", JSON.stringify({"version": info.version, "git": api.git}))
 }
 
 async function getVersionDetails() {
