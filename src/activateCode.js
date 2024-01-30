@@ -35,19 +35,21 @@ async function main() {
     let response;
     console.log("Megpróbáljuk a kódot... Ez eltarthat egy pár percig (kb. 30s-1m30s)")
     while (!found) {
-        await sleep(10)
-        //Read File from github rep
-        response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
-            method: "GET",
-        })
-        console.log(response.status, sha)
-        if (response.status === 200) {
-            response = await response.json()
-            if (response.time === time) {
-                found = true
-                console.log(response)
+        try {
+            await sleep(10)
+            //Read File from github rep
+            response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
+                method: "GET",
+            })
+            console.log(response.status, sha)
+            if (response.status === 200) {
+                response = await response.json()
+                if (response.time === time) {
+                    found = true
+                    console.log(response)
+                }
             }
-        }
+        } catch(err) {console.log(err)}
     }
     console.log("\u001b[32mÍgy már " + response.usesLeft + " használatod van!")
     if (response.error != null) {
