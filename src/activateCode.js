@@ -46,13 +46,14 @@ async function main() {
             if (response.time === time) {
                 found = true
                 console.log(response)
-                if (response.error != null) {
-                    console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
-                    return "error"
-                }
             }
         }
     }
     console.log("\u001b[32mÍgy már " + response.usesLeft + " használatod van!")
+    if (response.error != null) {
+        console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
+        await sleep(20)
+        return "error"
+    }
     await sleep(20)
 }
