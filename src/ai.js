@@ -59,7 +59,6 @@ async function answerQuestions(keepBeforeAnswers, log) {
     //Read files in github rep
     while (!found) {
         try {
-            await sleep(10)
             response = await fetch("https://redmentasolver.github.io/" + sha + ".json", {
                 method: "GET",
             })
@@ -76,6 +75,7 @@ async function answerQuestions(keepBeforeAnswers, log) {
                     return "error"
                 }
             }
+            await sleep(10)
         } catch(err) {console.log(err)}
     }
     //log response
