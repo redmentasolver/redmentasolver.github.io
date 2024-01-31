@@ -69,13 +69,11 @@ async function answerQuestions(keepBeforeAnswers, log) {
                 if (log) console.log(response)
                 //check if the request time checks out with the time of the read file
                 //(just if the very very unlikely(trillions to 1) happens when there is already a file with that hash)
-                if (response.time === blocks.time) {
-                    found = true
-                    //log error if any
-                    if (response.error != null) {
-                        console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
-                        return "error"
-                    }
+                found = true
+                //log error if any
+                if (response.error != null) {
+                    console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
+                    return "error"
                 }
             }
         } catch(err) {console.log(err)}
