@@ -4,7 +4,6 @@ async function main() {
     try {api = require('./api.json')}
     catch {api.version = "0.0.0"}
 
-    console.log(api)
     //Update if current version is lower than the one on github
     const { returnHigherVersion , getVersionDetails, update} = require("./update");
     if(returnHigherVersion(api.version, (await getVersionDetails()).version) !== api.version) await update()
