@@ -13,7 +13,7 @@ async function answerQuestions(keepBeforeAnswers, log) {
     const api = JSON.parse(fs.readFileSync(__dirname + "/api.json", { encoding: "utf-8" }))
     blocks.time = new Date().getTime()
     console.log(JSON.stringify(blocks.blocks) + api.git + blocks.time.toString())
-    const sha = sha256(api.git + blocks.time.toString())
+    const sha = sha256(api.git + blocks.ks_id.toString())
     console.log(sha)
     let answers = []
     if (log) console.log(blocks)
