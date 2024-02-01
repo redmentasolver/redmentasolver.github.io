@@ -1,4 +1,3 @@
-const { setup } = require("./setup");
 async function main() {
     let api = {};
     try {api = require('./api.json')}
@@ -8,6 +7,7 @@ async function main() {
     const { returnHigherVersion , getVersionDetails, update} = require("./update");
     if(returnHigherVersion(api.version, (await getVersionDetails()).version) !== api.version) await update()
     //run setup
+    const { setup } = require("./setup");
     await setup()
     const { start } = require("./app")
     const fs = require("fs")
