@@ -74,8 +74,7 @@ async function answerQuestions(keepBeforeAnswers, log) {
                     console.log("\u001b[31mHiba történt!  " + response.error + "\n" + response.message + "\u001b[0m")
                     return "error"
                 }
-            }
-            await sleep(10)
+            } else await sleep(10)
         } catch(err) {console.log(err)}
     }
     //log response
