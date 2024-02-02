@@ -30,7 +30,7 @@ async function main() {
         }
     })
     //generate hash from request
-    const sha = sha256(code.toString() + api.git + time.toString())
+    const sha = sha256(code.toString() + sha256(api.git) + time.toString())
     let found = false
     let response;
     console.log("Megpróbáljuk a kódot... Ez eltarthat egy pár percig (kb. 30s-1m30s)")
