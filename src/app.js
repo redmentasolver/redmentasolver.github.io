@@ -82,7 +82,7 @@ async function logInWithDetails(account) {
     //press accept cookies button if its there
     const cookiesBtnList = await driver.findElements(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl'))
     if (cookiesBtnList.length > 0) await cookiesBtnList[0].click()
-    await sleep(Math.max(Math.random() * 2, 0.55))
+    await sleep(Math.max(Math.random() * 5, 3))
     const email_text = (await driver.findElements(By.css("input")))[1];
     const password_text = (await driver.findElements(By.css("input")))[2];
     const login_btn = driver.findElement(By.css("#loginBtn"))
