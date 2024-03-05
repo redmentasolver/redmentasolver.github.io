@@ -169,7 +169,7 @@ async function load(account) {
     //Start filling
     const start_btn = await driver.findElement(By.css("#startFillingBtn"))
     start_btn.click()
-    await sleep(1)
+    await sleep(10)
     let keepAnswers = false
     let nextPage = true
     while (nextPage) {
