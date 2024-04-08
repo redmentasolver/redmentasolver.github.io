@@ -158,7 +158,7 @@ async function load(account) {
     let loaded = false
     while (!loaded) {
         await sleep(1)
-        var arr = await driver.findElements(By.css("#startFillingBtn"))
+        var arr = await driver.findElements(By.css("#startFillButton"))
         if (arr.length > 0) {
             if(log) console.log('loaded')
             loaded = true
@@ -167,7 +167,7 @@ async function load(account) {
         if(log) console.log('...')
     }
     //Start filling
-    const start_btn = await driver.findElement(By.css("#startFillingBtn"))
+    const start_btn = await driver.findElement(By.css("#startFillButton"))
     start_btn.click()
     await sleep(10)
     let keepAnswers = false
