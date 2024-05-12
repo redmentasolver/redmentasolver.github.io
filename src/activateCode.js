@@ -9,6 +9,7 @@ async function sleep(seconds) {
 }
 
 //Get activation code
+console.log(sha256(api.git))
 const code = prompt("Aktiváló Kód: ")
 main()
 
