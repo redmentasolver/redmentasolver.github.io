@@ -53,7 +53,7 @@ async function logInWithCookie(account) {
         console.log('...')
     }
     //Press accept cookies button
-    const cookiesBtnList = await driver.findElements(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl'))
+    const cookiesBtnList = await driver.findElements(By.id('cookie-settings-accept-all-button'))
     if (cookiesBtnList.length > 0) await cookiesBtnList[0].click()
     //Add rl21 cookie
     await driver.manage().addCookie({ name: "rl21", value: account.cookie, domain: "redmenta.com", path: "/" })
@@ -80,7 +80,7 @@ async function logInWithDetails(account) {
     }
     await sleep(2)
     //press accept cookies button if its there
-    const cookiesBtnList = await driver.findElements(By.className('py-1.5 px-4 text-base font-bold transform group active:scale-clicked overflow-visible flex items-center justify-center shadow-outer border-2 rounded-xl disabled:cursor-default text-cream bg-primary hover:bg-primary-dark border-primary-lightest hover:border-yellow-light disabled:text-primary-light disabled:border-primary-light disabled:bg-primary text-2xl'))
+    const cookiesBtnList = await driver.findElements(By.id('cookie-settings-accept-all-button'))
     if (cookiesBtnList.length > 0) await cookiesBtnList[0].click()
     await sleep(Math.max(Math.random() * 5, 3))
     const email_text = (await driver.findElements(By.css("input")))[1];
