@@ -427,7 +427,7 @@ async function writeEssay(answer) {
     textarea.click()
     textarea.clear()
     if(log) console.log(answer.answer)
-    textarea.sendKeys(answer.answer)
+    textarea.sendKeys(answer.answer[0])
 }
 async function shortAnswer(answer) {
     if (answer.answer == undefined) return
@@ -435,7 +435,7 @@ async function shortAnswer(answer) {
     textarea.click()
     textarea.clear()
     if(log) console.log(answer.answer)
-    textarea.sendKeys(answer.answer)
+    textarea.sendKeys(answer.answer[0])
 }
 async function missingText(answer) {
     let int = 0
