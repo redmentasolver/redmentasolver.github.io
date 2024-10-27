@@ -104,7 +104,7 @@ async function logInWithDetails(account) {
     while (!loaded) {
         await sleep(Math.max(Math.random() / 2, 0.05))
         //look for a button thats on the main page(if its there the site loaded)
-        var arr = await driver.findElements(By.css("#desktop > main > div > div.flex.flex-column.gap-4.pt-7.items-center.w-full > div > div > button > div"))
+        var arr = await driver.findElements(By.css("#desktop > main > div > div"))
         if (arr.length > 0) {
             if(log) console.log('loaded')
             loaded = true
