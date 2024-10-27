@@ -287,7 +287,7 @@ async function load(account) {
 async function fillOut() {
     if(log) console.log("Start Filling...")
     const answers = JSON.parse(fs.readFileSync(__dirname + "/answers.json", { encoding: "utf-8" })).answers
-    if(log) console.log("Read answers successfully")
+    if(log) console.log("Read answers successfully", answers)
     for (let j = 0; j < answers.length; j++) {
         try {
             if ((await driver.findElements(By.css("#" + answers[j].id))).length > 0) {
